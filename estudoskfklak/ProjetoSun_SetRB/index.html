@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Player de Música</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #a29bfe;
+            --dark-color: #2d3436;
+            --light-color: #f5f6fa;
+            --text-color: #636e72;
+            --highlight-color: #fd79a8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark-color);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .music-container {
+            padding: 20px;
+        }
+
+        .music-list {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .music-item {
+            cursor: pointer;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            background-color: rgba(108, 92, 231, 0.05);
+            border-left: 4px solid transparent;
+        }
+
+        .music-item:hover {
+            background-color: rgba(108, 92, 231, 0.1);
+            transform: translateX(5px);
+        }
+
+        .music-item.playing {
+            background-color: rgba(108, 92, 231, 0.15);
+            border-left: 4px solid var(--primary-color);
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .music-item i {
+            margin-right: 15px;
+            color: var(--primary-color);
+        }
+
+        .player {
+            background-color: var(--light-color);
+            padding: 20px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .player__container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .player__controls {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .player__controls button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+        }
+
+        .player__controls button:hover {
+            background-color: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        .player__controls button:disabled {
+            background-color: #dfe6e9;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .player__info {
+            width: 100%;
+            text-align: center;
+            padding: 10px;
+            background-color: white;
+            border-radius: 8px;
+            margin-top: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        #current-song {
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background-color: #dfe6e9;
+            border-radius: 3px;
+            margin: 15px 0;
+            cursor: pointer;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary-color);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 0.8rem;
+            color: var(--text-color);
+            margin-top: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+            }
+            
+            body {
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Seu melhor player de músicas</h1>
+            <p class="subtitle">Ouça gratuitamente seus sets</p>
+        </header>
+
+        <div class="music-container">
+            <h2>Minha Playlist</h2>
+            <ul class="music-list" id="music-list">
+                <li class="music-item" data-src="c:\Users\Matheus\Music\Set by RB\Bronka - Electric Baile Vol. 2 - 01 Oh Novinha! w- Dj Dimas, Prosp3ct.mp3
+                ">
+                    <i class="fas fa-music"></i> Levi - Birthday Sex (Levi Mix)
+                </li>
+                <li class="music-item" data-src="./src/assets/musics/lady_klap_omar_duro.mp3" data-name="Lady Klap - Omar Duro">
+                    <i class="fas fa-music"></i> Lady Klap - Omar Duro
+                </li>
+                <li class="music-item" data-src="./src/assets/musics/fodeprakaralho.mp3" data-name="Fodeprakaralho">
+                    <i class="fas fa-music"></i> Fodeprakaralho
+                </li>
+            </ul>
+        </div>
+
+        <ul class="music-list" id="music-list">
+            <li class="music-item" data-src="musicas/levi_birthday_sex.mp3" data-name="Levi - Birthday Sex">
+                <i class="fas fa-music"></i> Levi - Birthday Sex
+            </li>
+            <li class="music-item" data-src="musicas/lady_klap_omar_duro.mp3" data-name="Lady Klap - Omar Duro">
+                <i class="fas fa-music"></i> Lady Klap - Omar Duro
+            </li>
+            <li class="music-item" data-src="musicas/fodeprakaralho.mp3" data-name="Fodeprakaralho">
+                <i class="fas fa-music"></i> Fodeprakaralho
+            </li>
+        </ul>
+
+
+        <footer class="player">
+            <div class="player__container">
+                <audio id="audio-player"></audio>
+                
+                <div class="progress-container" id="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                
+                <div class="time-info">
+                    <span id="current-time">0:00</span>
+                    <span id="duration">0:00</span>
+                </div>
+                
+                <div class="player__controls">
+                    <button id="prev-button"><i class="fas fa-step-backward"></i></button>
+                    <button id="play-button"><i class="fas fa-play"></i></button>
+                    <button id="pause-button" disabled><i class="fas fa-pause"></i></button>
+                    <button id="next-button"><i class="fas fa-step-forward"></i></button>
+                </div>
+                
+                <div class="player__info">
+                    <span id="current-song">Nenhuma música selecionada</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const audioPlayer = document.getElementById('audio-player');
+        const playButton = document.getElementById('play-button');
+        const pauseButton = document.getElementById('pause-button');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const currentSongDisplay = document.getElementById('current-song');
+        const musicList = document.getElementById('music-list');
+        const musicItems = document.querySelectorAll('.music-item');
+        const progressBar = document.getElementById('progress-bar');
+        const progressContainer = document.getElementById('progress-container');
+        const currentTimeDisplay = document.getElementById('current-time');
+        const durationDisplay = document.getElementById('duration');
+
+        let currentSongIndex = 0;
+        let isPlaying = false;
+
+        // Formata o tempo em minutos:segundos
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // Atualiza a barra de progresso
+        function updateProgress() {
+            const { duration, currentTime } = audioPlayer;
+            const progressPercent = (currentTime / duration) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+            currentTimeDisplay.textContent = formatTime(currentTime);
+        }
+
+        // Define a posição da música ao clicar na barra de progresso
+        function setProgress(e) {
+            const width = this.clientWidth;
+            const clickX = e.offsetX;
+            const duration = audioPlayer.duration;
+            audioPlayer.currentTime = (clickX / width) * duration;
+        }
+
+        // Carrega e toca a música
+        function loadSong(index) {
+            const item = musicItems[index];
+            const songSrc = item.getAttribute('data-src');
+            const songName = item.getAttribute('data-name');
+            
+            audioPlayer.src = songSrc;
+            currentSongDisplay.textContent = songName;
+            
+            // Remove a classe 'playing' de todos os itens
+            musicItems.forEach(item => item.classList.remove('playing'));
+            // Adiciona a classe 'playing' ao item atual
+            item.classList.add('playing');
+            
+            // Quando os metadados da música são carregados
+            audioPlayer.addEventListener('loadedmetadata', () => {
+                durationDisplay.textContent = formatTime(audioPlayer.duration);
+            });
+            
+            playAudio();
+        }
+
+        // Toca a música
+        function playAudio() {
+            audioPlayer.play()
+                .then(() => {
+                    isPlaying = true;
+                    playButton.disabled = true;
+                    pauseButton.disabled = false;
+                })
+                .catch(error => {
+                    console.error('Erro ao reproduzir:', error);
+                    alert('Erro ao reproduzir a música. Verifique se o arquivo existe.');
+                });
+        }
+
+        // Pausa a música
+        function pauseAudio() {
+            audioPlayer.pause();
+            isPlaying = false;
+            playButton.disabled = false;
+            pauseButton.disabled = true;
+        }
+
+        // Música anterior
+        function prevSong() {
+            currentSongIndex--;
+            if (currentSongIndex < 0) {
+                currentSongIndex = musicItems.length - 1;
+            }
+            loadSong(currentSongIndex);
+        }
+
+        // Próxima música
+        function nextSong() {
+            currentSongIndex++;
+            if (currentSongIndex > musicItems.length - 1) {
+                currentSongIndex = 0;
+            }
+            loadSong(currentSongIndex);
+        }
+
+        // Event Listeners
+        playButton.addEventListener('click', playAudio);
+        pauseButton.addEventListener('click', pauseAudio);
+        prevButton.addEventListener('click', prevSong);
+        nextButton.addEventListener('click', nextSong);
+
+        // Quando uma música termina, toca a próxima
+        audioPlayer.addEventListener('ended', nextSong);
+
+        // Atualiza a barra de progresso
+        audioPlayer.addEventListener('timeupdate', updateProgress);
+
+        // Clique na barra de progresso
+        progressContainer.addEventListener('click', setProgress);
+
+        // Clique nos itens da lista de músicas
+        musicItems.forEach((item, index) => {
+            item.addEventListener('click', () => {
+                currentSongIndex = index;
+                loadSong(currentSongIndex);
+            });
+        });
+
+        // Inicializa com a primeira música
+        if (musicItems.length > 0) {
+            loadSong(0);
+        }
+
+        <ul class="music-list" id="music-list">
+    <li class="music-item" data-src="musicas/levi_birthday_sex.mp3" data-name="Levi - Birthday Sex">
+        <i class="fas fa-music"></i> Levi - Birthday Sex
+    </li>
+    <li class="music-item" data-src="musicas/lady_klap_omar_duro.mp3" data-name="Lady Klap - Omar Duro">
+        <i class="fas fa-music"></i> Lady Klap - Omar Duro
+    </li>
+    <li class="music-item" data-src="musicas/fodeprakaralho.mp3" data-name="Fodeprakaralho">
+        <i class="fas fa-music"></i> Fodeprakaralho
+    </li>
+</ul>
+    </script>
+</body>
+</html>
